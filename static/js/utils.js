@@ -1,0 +1,24 @@
+// Error message extraction from API responses
+export function getErrorMessage(error) {
+    if (typeof error.detail === "string") {
+    return error.detail;
+    } else if (Array.isArray(error.detail)) {
+    return error.detail.map((err) => err.msg).join(". ");
+    }
+    return "An error occurred. Please try again.";
+}
+
+// Show a Bootstrap modal by ID
+export function showModal(modalid) {
+    const modal = bootstrap.Modal.getOrCreateInstance(
+    document.getElementById(modalid)
+    );
+    modal.show();
+    return modal;
+}
+
+// Hide a Bootstrap modal by ID
+export function hideModal(modalid) {
+    const modal = bootstrap.Modal.getInstance(document.getElementById(modalid));
+    if (modal) modal.hide();
+}

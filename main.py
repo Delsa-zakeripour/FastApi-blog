@@ -45,7 +45,11 @@ async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
     # posts = db.execute(
     #     select(models.Post).options(selectinload(models.Post.author))
     # ).scalars().all()
-    result = await db.execute(select(models.Post).options(selectinload(models.Post.author)),)
+    result = await db.execute(
+        select(models.Post)
+        .options(selectinload(models.Post.author))
+        .order_by(models.Post.date_posted.desc())
+    )
     posts = result.scalars().all()
     return templates.TemplateResponse(
         request,
@@ -62,7 +66,7 @@ async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
 #         {"posts":posts, "title":"Home"}
 #     )
 
-@app.get("/posts/{post_id}", include_in_schema=False)
+@app.get("/posts/{post_id}", include_in_schema=False, name="post_page")
 async def post_page(request: Request,post_id: int, db: Annotated[AsyncSession,Depends(get_db)]):
     result = await db.execute(
         select(models.Post)
@@ -71,10 +75,15 @@ async def post_page(request: Request,post_id: int, db: Annotated[AsyncSession,De
     post = result.scalars().first()
     if post:
           title = post.title[:50]
+          # TEMPORARY - hardcoded until authorization (Tutorial 11)
+          user_result = await db.execute(
+              select(models.User).where(models.User.id == 1)
+          )
+          current_user = user_result.scalars().first()
           return templates.TemplateResponse(
                 request,
                 'post.html',
-                {"post":post, "title":title}
+                {"post": post, "title": title, "current_user": current_user}
     )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Post not found")
 
@@ -91,10 +100,12 @@ async def user_post_page(request: Request,user_id: int, db: Annotated[AsyncSessi
     result = await db.execute(
         select(models.Post)
         .options(selectinload(models.Post.author))
-        .where(models.Post.user_id == user_id))
+        .where(models.Post.user_id == user_id)
+        .order_by(models.Post.date_posted.desc())
+        )
     posts = result.scalars().all()
     return templates.TemplateResponse(
-        request,"user_posts.html",
+        request,"user_post.html",
         {"posts":posts, "user": user, "title": f"{user.username}'s Posts"}
     )
 

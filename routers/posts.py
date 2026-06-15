@@ -16,12 +16,12 @@ router = APIRouter()
 
 @router.get("", response_model=list[PostResponse])
 async def get_posts(db: Annotated[AsyncSession, Depends(get_db)]):
-    result = await db.execute(select(models.Post).options(selectinload(models.Post.author)))
+    result = await db.execute(select(models.Post).options(selectinload(models.Post.author)).order_by(models.Post.date_posted.desc()))
     posts = result.scalars().all()
     return posts
 
 
-@router.post('/', response_model=PostResponse, status_code=status.HTTP_201_CREATED)
+@router.post('', response_model=PostResponse, status_code=status.HTTP_201_CREATED)
 async def create_post(post:PostCreate, db:Annotated[AsyncSession,Depends(get_db)]):
     result = await db.execute(select(models.User).where(models.User.id == post.user_id))
     user =result.scalars().first()
@@ -39,11 +39,11 @@ async def create_post(post:PostCreate, db:Annotated[AsyncSession,Depends(get_db)
     
     db.add(new_post)
     await db.commit()
-    await db.refresh(new_post)
-    # db.refresh(new_post, attribute_names=["author"])
+    # await db.refresh(new_post)
+    await db.refresh(new_post, attribute_names=["author"])
     return new_post
 
-
+    
 
 @router.get("/{post_id}" , response_model=PostResponse)
 async def get_post(post_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
