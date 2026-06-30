@@ -21,4 +21,20 @@ export function showModal(modalid) {
 export function hideModal(modalid) {
     const modal = bootstrap.Modal.getInstance(document.getElementById(modalid));
     if (modal) modal.hide();
+} 
+
+export function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+
+export function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "2-digit"
+    });
 }

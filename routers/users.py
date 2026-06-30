@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from PIL import UnidentifiedImageError
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -21,7 +21,7 @@ from auth import (
 from config import settings
 import models
 from database import get_db
-from schemas import  PostResponse, UserCreate, UserPublic, UserUpdate , Token , UserPrivate
+from schemas import  paginatedPostsResponse, PostResponse, UserCreate, UserPublic, UserUpdate , Token , UserPrivate
 import schemas
 from image_utils import delete_profile_image, process_profile_image, save_profile_image
 
@@ -176,22 +176,49 @@ async def get_user(user_id: int , db: Annotated[AsyncSession, Depends(get_db)]):
 #     users = result.scalars().all()
 #     return users
     
-
-@router.get("/{user_id}/posts" , response_model=list[PostResponse])
-async def get_user_posts(user_id: int , db: Annotated[AsyncSession, Depends(get_db)]):
-    result = await db.execute(select(models.User).where(models.User.id == user_id),)
+@router.get("/{user_id}/posts", response_model=paginatedPostsResponse)
+# @router.get("/{user_id}/posts", response_model=list[PostResponse])
+async def get_user_posts(
+    user_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    skip: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = settings.posts_per_page,
+):
+    result = await db.execute(select(models.User).where(models.User.id == user_id))
     user = result.scalars().first()
-    if not user :
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
 
-    result = await  db.execute(
+    count_result = await db.execute(
+        select(func.count())
+        .select_from(models.Post)
+        .where(models.Post.user_id == user_id),
+    )
+    total = count_result.scalar() or 0
+
+    result = await db.execute(
         select(models.Post)
         .options(selectinload(models.Post.author))
         .where(models.Post.user_id == user_id)
         .order_by(models.Post.date_posted.desc())
-        )
+        .offset(skip)
+        .limit(limit),
+    )
     posts = result.scalars().all()
-    return posts
+
+    has_more = skip + len(posts) < total
+
+    return paginatedPostsResponse(
+        posts=[PostResponse.model_validate(post) for post in posts],
+        total=total,
+        skip=skip,
+        limit=limit,
+        has_more=has_more,
+    )
+
 
 
 @router.patch("/{user_id}" , response_model=UserPublic)
