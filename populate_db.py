@@ -290,8 +290,13 @@ async def update_post_dates() -> None:
         await db.commit()
     print("Updated post dates")
 
-
+async def create_tables() -> None:
+    async with engine.begin() as conn:
+        await conn.run_sync(models.Base.metadata.create_all)
+    print("Tables created") 
+    
 async def populate() -> None:
+    await create_tables()
     transport = httpx.ASGITransport(app=app)
 
     async with httpx.AsyncClient(
