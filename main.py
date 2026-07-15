@@ -10,7 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy import select, func, text
 from sqlalchemy.orm import selectinload
 import models
-from database import engine, get_db
+from database import engine, get_db, run_migrations
 from contextlib import asynccontextmanager
 from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,9 +21,7 @@ from config import settings
 # Base.metadata.create_all(bind=engine) for sync function
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    #startup 
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.create_all)
+    await run_migrations()
     yield
     #Shutdown
     await engine.dispose()
