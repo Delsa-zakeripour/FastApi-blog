@@ -1,0 +1,25 @@
+name: Hello CI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+job:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say hello
+        run: echo "Hello from GitHub Actions!"
+
+      - name: Show wher we are
+        run: |
+          pwd 
+          ls -la
+          python3 --version
+
+      - name: Get the code
+        uses: actions/checkout@v5
+
+      - name: Show files again
+        run: ls -la
