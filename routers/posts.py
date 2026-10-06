@@ -6,10 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 import models
-from database import get_db
-from schemas import  PostResponse, PostCreate, PostUpdate, paginatedPostsResponse
 from auth import CurrentUser
-
+from database import get_db
+from schemas import PostCreate, PostResponse, PostUpdate, paginatedPostsResponse
 
 router = APIRouter() 
 

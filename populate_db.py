@@ -3,11 +3,11 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import httpx
-from sqlalchemy import delete, select, update
+from sqlalchemy import select, update
 
 import models
-from config import settings
 from database import AsyncSessionLocal, engine
+
 # from image_utils import _get_s3_client
 from main import app
 

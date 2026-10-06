@@ -1,10 +1,11 @@
 # from sqlalchemy import  create_engine 
 import asyncio
 
-from alembic import command
 from alembic.config import Config
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+
+from alembic import command
 from config import settings
 
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./blog.db" the comment are the code befor async 

@@ -1,22 +1,26 @@
+from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import FastAPI,Request,HTTPException,status,Depends
+from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.exception_handlers import (
+    http_exception_handler,
+    request_validation_exception_handler,
+)
+from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
+
 # from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from sqlalchemy import select, func, text
-from sqlalchemy.orm import selectinload
-import models
-from database import engine, get_db, run_migrations
-from contextlib import asynccontextmanager
-from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from routers import posts,users
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+import models
 from config import settings
+from database import engine, get_db, run_migrations
+from routers import posts, users
+
 
 # Base.metadata.create_all(bind=engine) for sync function
 @asynccontextmanager

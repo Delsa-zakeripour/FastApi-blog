@@ -1,5 +1,6 @@
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
-from datetime import datetime
+
 
 class UserBase(BaseModel):
     username: str= Field(min_length=1, max_length=50)

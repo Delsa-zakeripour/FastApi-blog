@@ -14,8 +14,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import models
 from config import settings
 from database import get_db
-import hashlib
-import secrets
 
 password_hash = PasswordHash.recommended()
 
