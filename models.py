@@ -29,7 +29,7 @@ class User(Base):
 
     reset_tokens: Mapped[list[PasswordResetToken]] = relationship(
         back_populates="user",
-        cascade="all, delete-orphan",
+        cascade="all, delete-orphan", # delete a user → their posts go too
     )
 
 

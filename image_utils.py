@@ -11,7 +11,7 @@ def process_profile_image(content: bytes) -> tuple[bytes, str]:
     with Image.open(BytesIO(content)) as original:
         img = ImageOps.exif_transpose(original)
 
-        img = ImageOps.fit(img, (300, 300), method=Image.Resampling.LANCZOS)
+        img = ImageOps.fit(img, (300, 300), method=Image.Resampling.LANCZOS) #LANCZOS is a high-quality resampling algorithm used when resizing images.
 
         if img.mode in ("RGBA", "LA", "P"):
             img = img.convert("RGB")

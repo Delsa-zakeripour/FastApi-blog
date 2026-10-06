@@ -1,0 +1,10 @@
+.git/
+
+.tests/
+
+
+.env
+
+.python-version 
+
+.venv/
