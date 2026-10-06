@@ -5,16 +5,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
-job:
+jobs:
   hello:
     runs-on: ubuntu-latest
     steps:
       - name: Say hello
         run: echo "Hello from GitHub Actions!"
 
-      - name: Show wher we are
+      - name: Show where we are
         run: |
-          pwd 
+          pwd
           ls -la
           python3 --version
 
